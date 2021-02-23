@@ -1,0 +1,81 @@
+Manager:
+  experiment: FundusClassification
+  run: Transformer
+  save_point: /home/clement/Documents/Clement/runs/
+  gpu: 0
+  max_saved_model: 1
+  num_workers: 12 # Workers used for parallel data loading
+  dist_backend: nccl
+  seed: 1234
+
+Dataset:
+#  shape: [1520,496] # wxh
+  shape: [384, 384]
+#  shape: [224, 224]
+  keep_size_ratio: True
+  img_url: /home/clement/Documents/database/eyePACS/train/
+  recursive_loading: True
+  csv_filepath: /home/clement/Documents/database/eyePACS/trainLabels.csv
+
+Test:
+  shape: [384, 384]
+  keep_size_ratio: True
+  img_url: /home/clement/Documents/database/aptos/train_images/
+  csv_filepath: /home/clement/Documents/database/aptos/train.csv
+  gt_column: diagnosis
+  file_column: id_code
+
+
+Preprocessing:
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+#  mean: [0,0,0]
+#  std: [1,1,1]
+Validation:
+  size: 500
+  log_interval: 1000
+  max_batch_validation: -1
+
+Training:
+  epochs: 100
+  batch_size: 32
+  iters_to_accumulate: 1
+  weighted_loss: False
+  grad_scaling: True
+  amp: True
+  params_weighting:
+    mode: balanced
+    log_smoothing: 1.5
+    center_mean: 1.0
+
+Loss:
+  fusion: sum
+  SoftCrossEntropy:
+    smooth_factor: 0.1
+
+Optimizer:
+  solver: Adam
+  params_solver:
+    lr: 0.001
+#    betas: [.9,.99]
+    weight_decay: 0.0001
+#    nesterov: True
+#    momentum: 0.9
+#    dampening: 0
+
+Learning_rate_scheduler:
+  update_type: on_validation # or on_epoch
+  scheduler: ReduceLROnPlateau
+  params_scheduler:
+    mode: max
+    factor: 0.1
+    patience: 10
+    min_lr: 0.000001
+    verbose: True
+
+Network:
+  architecture: vit_base_patch32_384
+  pretrained: True
+  n_classes: 5
+  synchronized_batch_norm: False
+
