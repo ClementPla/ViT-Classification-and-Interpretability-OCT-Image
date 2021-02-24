@@ -11,7 +11,6 @@ def to_rgb(image):
     else:
         return image
 
-
 @nntools_wrapper
 def crop_fundus(image):
     try:

@@ -1,12 +1,10 @@
 from nntools.utils import Config
-
 from experiment import OCTClassification
-from fundus_experiment import FundusClassification
 
 if __name__ == '__main__':
-    config_path = 'config.yaml'
+    config_path = 'configs/config.yaml'
     config = Config(config_path)
-    config['Manager']['run'] = 'ResNet152'
+    config['Manager']['run'] = 'vit_deit_base_distilled_patch16_384'
     config['Network']['architecture'] = config['Manager']['run']
 
     experiment = OCTClassification(config)

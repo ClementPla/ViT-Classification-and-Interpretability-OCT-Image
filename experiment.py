@@ -9,11 +9,11 @@ import torch.distributed as dist
 from nntools.dataset.image_tools import normalize
 from nntools.experiment import Experiment
 from nntools.utils import reduce_tensor, create_folder
-from networks import get_network
+from networks.networks import get_network
 from utils import to_rgb, crop_fundus, quick_resize
 
 from nntools.tracker import Log, Tracker, log_params, log_metrics, log_artifact
-
+import deit_loss
 
 class OCTClassification(Experiment):
     def __init__(self, config, run_id=None):
@@ -22,6 +22,7 @@ class OCTClassification(Experiment):
         """
         Create network
         """
+        architecture = self.config['Network']['architecture']
         network = get_network(self.config['Network'])
         if hasattr(network, 'no_weight_decay'):
             remove_weight_decay = network.no_weight_decay()
@@ -55,7 +56,13 @@ class OCTClassification(Experiment):
         """
         Create datasets
         """
-        dataset = D.ClassificationDataset(**self.config['Dataset'])
+        if 'deit' in architecture:
+            from datasets.deit_dataset import DeitDataset
+            table_path = '/home/clement/Documents/Clement/runs/mlruns/1/f225fafe580e48d491e1eebe122d0635/artifacts' \
+                         '/train_predictions_log.csv'
+            dataset = DeitDataset(table_path, **self.config['Dataset'])
+        else:
+            dataset = D.ClassificationDataset(**self.config['Dataset'])
         dataset.set_composition(composer)
         valid_len = self.config['Validation']['size']
         train_len = len(dataset) - valid_len
@@ -93,13 +100,14 @@ class OCTClassification(Experiment):
 
     def start(self):
         """
-               Start the run
-               """
+       Start the run
+       """
         self.start_run()
         log_artifact(self.tracker, os.path.realpath(__file__))
         super(OCTClassification, self).start()
 
     def validate(self, model, iteration, rank=0, loss_function=None):
+        model.network.training = False
         valid_loader, valid_sampler = self.get_dataloader(self.validation_dataset, shuffle=False)
         confMat = torch.zeros(self.n_classes, self.n_classes).cuda(self.get_gpu_from_rank(rank))
         for batch in valid_loader:
@@ -123,9 +131,11 @@ class OCTClassification(Experiment):
                     self.tracked_metric = mIoU
                     filename = ('iteration_%i_mIoU_%.3f' % (iteration, mIoU)).replace('.', '')
                     self.save_model(model, filename=filename)
+        model.network.training = True
         return mIoU
 
-    def end(self, model, rank, save_pred=True, save_proba=False):
+    def end(self, model, rank, save_proba=False):
+        model.training = False
         map_location = {'cuda:%d' % 0: 'cuda:%d' % self.get_gpu_from_rank(rank)}
         model.load(self.tracker.network_savepoint, load_most_recent=True, map_location=map_location, strict=True)
         model.eval()
@@ -175,12 +185,12 @@ class OCTClassification(Experiment):
                 stats['mIoU'] = mIoU
                 test_scores = {}
                 for k in stats:
-                    test_scores['test_private_%s' % k] = stats[k]
+                    test_scores['test_%s' % k] = stats[k]
                 log_metrics(self.tracker, step=0, **test_scores)
                 confMat = confMat.cpu().numpy()
-                np.save(os.path.join(self.tracker.prediction_savepoint, 'test_private_confMat.npy'), confMat)
-                log_artifact(self.tracker, os.path.join(self.tracker.prediction_savepoint, 'test_private_confMat.npy'))
+                np.save(os.path.join(self.tracker.prediction_savepoint, 'test_confMat.npy'), confMat)
+                log_artifact(self.tracker, os.path.join(self.tracker.prediction_savepoint, 'test_confMat.npy'))
                 import pandas as pd
                 df = pd.DataFrame.from_dict(self.log)
-                df.to_csv(os.path.join(self.tracker.prediction_savepoint, 'private_predictions_log.csv'))
-                log_artifact(self.tracker, os.path.join(self.tracker.prediction_savepoint, 'private_predictions_log.csv'))
+                df.to_csv(os.path.join(self.tracker.prediction_savepoint, 'test_predictions_log.csv'))
+                log_artifact(self.tracker, os.path.join(self.tracker.prediction_savepoint, 'test_predictions_log.csv'))

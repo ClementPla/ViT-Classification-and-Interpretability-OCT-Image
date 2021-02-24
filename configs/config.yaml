@@ -24,10 +24,10 @@ Test:
   img_url: /home/clement/Documents/database/CellData/OCT/test/
 
 Preprocessing:
-  mean: [0.485, 0.456, 0.406]
-  std: [0.229, 0.224, 0.225]
-#  mean: [0,0,0]
-#  std: [1,1,1]
+#  mean: [0.485, 0.456, 0.406]
+#  std: [0.229, 0.224, 0.225]
+  mean: [0.5,0.5,0.5]
+  std: [0.5,0.5,0.5]
 Validation:
   size: 500
   log_interval: 5000
@@ -35,17 +35,19 @@ Validation:
 
 Training:
   epochs: 100
-  batch_size: 32
+  batch_size: 8
   iters_to_accumulate: 1
 
 
 Loss:
   fusion: sum
-  type: SoftCrossEntropy
+  type: DistillationLossViT
   params_loss:
-    SoftCrossEntropy:
-      smooth_factor: 0.1
-  weighted_loss: False
+    DistillationLossViT:
+      smooth_factor: 0.05
+      loss_type: SoftCrossEntropy
+
+  weighted_loss: True
   params_weighting:
     mode: balanced
     log_smoothing: 1.5
