@@ -58,8 +58,7 @@ class OCTClassification(Experiment):
         """
         if 'deit' in architecture:
             from datasets.deit_dataset import DeitDataset
-            table_path = '/home/clement/Documents/Clement/runs/mlruns/1/f225fafe580e48d491e1eebe122d0635/artifacts' \
-                         '/train_predictions_log.csv'
+            table_path = 'datasets/train_predictions_log.csv'
             dataset = DeitDataset(table_path, **self.config['Dataset'])
         else:
             dataset = D.ClassificationDataset(**self.config['Dataset'])
