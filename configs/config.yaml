@@ -1,14 +1,14 @@
 Manager:
   experiment: OCT-Classification
   run: ResNetWide101
-  save_point: /home/clement/Documents/Clement/runs/
-  gpu: 0
+  save_point: /home/travail/clement/runs/
+  gpu: [0,1,2,3]
   max_saved_model: 1
-  num_workers: 4 # Workers used for parallel data loading
+  num_workers: 8 # Workers used for parallel data loading
   dist_backend: nccl
   seed: 1234
-  tracking_uri: /home/clement/Documents/Clement/runs/mlruns/
-  artifact_uri: /home/clement/Documents/Clement/runs/mlruns/
+  tracking_uri: http://localhost:5010
+  artifact_uri: sftp://clement@m3202-10.demdgi.polymtl.ca/home/clement/Documents/Clement/runs/server/artifact
   amp: True
   grad_scaling: True
 
@@ -17,11 +17,11 @@ Dataset:
   shape: [384, 384]
 #  shape: [224, 224]
   keep_size_ratio: False
-  img_url: /home/clement/Documents/database/CellData/OCT/train/
+  img_url: /home/travail/clement/Kermany/CellData/OCT/train/
   recursive_loading: True
 Test:
 #  img_url: /home/clement/Documents/database/PrivateKermany/Private Kermany-style OCT dataset/
-  img_url: /home/clement/Documents/database/CellData/OCT/test/
+  img_url: /home/travail/clement/Kermany/CellData/OCT/test/
 
 Preprocessing:
 #  mean: [0.485, 0.456, 0.406]
@@ -35,7 +35,7 @@ Validation:
 
 Training:
   epochs: 100
-  batch_size: 8
+  batch_size: 48
   iters_to_accumulate: 1
 
 
