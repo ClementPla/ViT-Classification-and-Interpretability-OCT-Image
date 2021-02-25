@@ -57,7 +57,7 @@ def get_network(config, img_size=None):
             del state_dict['head_dist' + '.weight']
             del state_dict['head_dist' + '.bias']
             if img_size != 384:
-                del state_dict['pos_embed:']
+                del state_dict['pos_embed']
             network.load_state_dict(state_dict, strict=False)
 
     if config['architecture'] == 'vit_large_patch16_384':
