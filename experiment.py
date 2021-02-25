@@ -23,7 +23,8 @@ class OCTClassification(Experiment):
         Create network
         """
         architecture = self.config['Network']['architecture']
-        network = get_network(self.config['Network'])
+        img_size = self.config['Dataset']['shape']
+        network = get_network(self.config['Network'], img_size)
         if hasattr(network, 'no_weight_decay'):
             remove_weight_decay = network.no_weight_decay()
         else:
