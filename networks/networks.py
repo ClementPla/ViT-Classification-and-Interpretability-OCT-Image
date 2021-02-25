@@ -73,7 +73,7 @@ def get_network(config, img_size=None):
             del state_dict['head' + '.weight']
             del state_dict['head' + '.bias']
             if img_size != 224:
-                del state_dict['pos_embed:']
+                del state_dict['pos_embed']
             network.load_state_dict(state_dict, strict=False)
     if config['architecture'] == 'T2T-ViT_t-24':
         from .T2T.models import T2t_vit_t_24
@@ -84,7 +84,7 @@ def get_network(config, img_size=None):
             del state_dict['head' + '.weight']
             del state_dict['head' + '.bias']
             if img_size != 224:
-                del state_dict['pos_embed:']
+                del state_dict['pos_embed']
             network.load_state_dict(state_dict, strict=False)
 
     if config['architecture'] == 'T2T-ViT-19':
@@ -96,7 +96,7 @@ def get_network(config, img_size=None):
             del state_dict['head' + '.weight']
             del state_dict['head' + '.bias']
             if img_size != 224:
-                del state_dict['pos_embed:']
+                del state_dict['pos_embed']
             network.load_state_dict(state_dict, strict=False)
 
     if config['architecture'] == 'OpticNet':
