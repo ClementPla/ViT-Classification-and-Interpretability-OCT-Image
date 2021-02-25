@@ -9,12 +9,12 @@ Manager:
   seed: 1234
   tracking_uri: /home/clement/Documents/Clement/runs/mlruns/
   artifact_uri: /home/clement/Documents/Clement/runs/mlruns/
-  amp: True
+  amp: False
   grad_scaling: True
 
 Dataset:
 #  shape: [1520,496] # wxh
-  shape: [384, 384]
+  shape: [224, 224]
 #  shape: [224, 224]
   keep_size_ratio: False
   img_url: /home/clement/Documents/database/CellData/OCT/train/
@@ -24,44 +24,43 @@ Test:
   img_url: /home/clement/Documents/database/CellData/OCT/test/
 
 Preprocessing:
-#  mean: [0.485, 0.456, 0.406]
-#  std: [0.229, 0.224, 0.225]
-  mean: [0.5,0.5,0.5]
-  std: [0.5,0.5,0.5]
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+#  mean: [0.5,0.5,0.5]
+#  std: [0.5,0.5,0.5]
 Validation:
   size: 500
-  log_interval: 5000
+  log_interval: 500
   max_batch_validation: -1
 
 Training:
   epochs: 100
-  batch_size: 8
+  batch_size: 64
   iters_to_accumulate: 1
 
 
 Loss:
   fusion: sum
-  type: DistillationLossViT
+  type: CrossEntropy
   params_loss:
-    DistillationLossViT:
+    SoftCrossEntropy:
       smooth_factor: 0.05
-      loss_type: SoftCrossEntropy
 
-  weighted_loss: True
+  weighted_loss: False
   params_weighting:
     mode: balanced
     log_smoothing: 1.5
     center_mean: 1.0
 
 Optimizer:
-  solver: SGD
+  solver: AdamW
   params_solver:
     lr: 0.001
 #    betas: [.9,.99]
-    weight_decay: 0.001
-    nesterov: True
-    momentum: 0.9
-    dampening: 0
+    weight_decay: 0.005
+#    nesterov: True
+#    momentum: 0.9
+#    dampening: 0
 
 Learning_rate_scheduler:
   update_type: on_validation # or on_epoch
