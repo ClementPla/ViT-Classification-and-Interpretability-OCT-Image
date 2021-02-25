@@ -18,7 +18,7 @@ Manager:
 Dataset:
 #  shape: [1520,496] # wxh
 # shape: [224, 224]
-  #shape: [384, 384]
+  shape: [384, 384]
   keep_size_ratio: False
   img_url: /home/travail/clement/Kermany/CellData/OCT/train/
   recursive_loading: True
