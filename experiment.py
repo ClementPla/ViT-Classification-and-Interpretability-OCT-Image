@@ -15,6 +15,7 @@ from utils import to_rgb, crop_fundus, quick_resize
 from nntools.tracker import Log, Tracker, log_params, log_metrics, log_artifact
 import deit_loss
 
+
 class OCTClassification(Experiment):
     def __init__(self, config, run_id=None):
         super(OCTClassification, self).__init__(config, run_id=run_id)
@@ -23,7 +24,7 @@ class OCTClassification(Experiment):
         Create network
         """
         architecture = self.config['Network']['architecture']
-        img_size = self.config['Dataset']['shape']
+        img_size = self.config['Dataset']['shape'][0]
         network = get_network(self.config['Network'], img_size)
         if hasattr(network, 'no_weight_decay'):
             remove_weight_decay = network.no_weight_decay()
