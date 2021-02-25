@@ -128,7 +128,7 @@ class OCTClassification(Experiment):
             else:
                 if mIoU > self.tracked_metric:
                     self.tracked_metric = mIoU
-                    filename = ('iteration_%i_mIoU_%.3f' % (iteration, mIoU)).replace('.', '')
+                    filename = ('best_valid_iteration_%i_mIoU_%.3f' % (iteration, mIoU)).replace('.', '')
                     self.save_model(model, filename=filename)
         model.network.training = True
         return mIoU
