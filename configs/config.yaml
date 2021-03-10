@@ -7,9 +7,9 @@ Manager:
   num_workers: 4 # Workers used for parallel data loading
   dist_backend: nccl
   seed: 1234
-  tracking_uri: /home/clement/Documents/Clement/runs/mlruns/
-  artifact_uri: /home/clement/Documents/Clement/runs/mlruns/
-  amp: False
+  tracking_uri: http://localhost:5010
+  artifact_uri: /home/clement/Documents/Clement/runs/server/artifact/
+  amp: True
   grad_scaling: True
 
 Dataset:
@@ -30,37 +30,37 @@ Preprocessing:
 #  std: [0.5,0.5,0.5]
 Validation:
   size: 500
-  log_interval: 500
+  log_interval: 5000
   max_batch_validation: -1
 
 Training:
   epochs: 100
-  batch_size: 64
+  batch_size: 32
   iters_to_accumulate: 1
+#  grad_clipping: 1.0
 
 
 Loss:
   fusion: sum
-  type: CrossEntropy
+  type: SoftCrossEntropy
   params_loss:
     SoftCrossEntropy:
       smooth_factor: 0.05
 
-  weighted_loss: False
+  weighted_loss: True
   params_weighting:
     mode: balanced
     log_smoothing: 1.5
-    center_mean: 1.0
+    center_mean: 0
 
 Optimizer:
-  solver: AdamW
+  solver: SGD
   params_solver:
     lr: 0.001
 #    betas: [.9,.99]
     weight_decay: 0.005
-#    nesterov: True
-#    momentum: 0.9
-#    dampening: 0
+    nesterov: True
+    momentum: 0.9
 
 Learning_rate_scheduler:
   update_type: on_validation # or on_epoch

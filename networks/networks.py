@@ -44,6 +44,10 @@ def get_network(config, img_size=None):
         from timm.models.vision_transformer import vit_base_patch32_384
         network = vit_base_patch32_384(pretrained=config['pretrained'], num_classes=config['n_classes'])
 
+    if config['architecture'] == 'vit_base_patch16_384':
+        from timm.models.vision_transformer import vit_base_patch16_384
+        network = vit_base_patch16_384(pretrained=config['pretrained'], num_classes=config['n_classes'])
+
     if config['architecture'] == 'vit_deit_base_distilled_patch16_384':
         from timm.models.vision_transformer import vit_deit_base_distilled_patch16_384
         network = vit_deit_base_distilled_patch16_384(pretrained=False, num_classes=config['n_classes'], img_size=img_size)
@@ -75,6 +79,18 @@ def get_network(config, img_size=None):
             if img_size != 224:
                 del state_dict['pos_embed']
             network.load_state_dict(state_dict, strict=False)
+    if config['architecture'] == 'T2T-ViT_t-14':
+        from .T2T.models import T2t_vit_14
+        network = T2t_vit_14(num_classes=config['n_classes'], img_size=img_size)
+        if config['pretrained']:
+            url_pretrained = MODELS_URLS['T2T-ViT-14']
+            state_dict = load_state_dict_from_url(url_pretrained, map_location='cpu')['state_dict_ema']
+            del state_dict['head' + '.weight']
+            del state_dict['head' + '.bias']
+            if img_size != 224:
+                del state_dict['pos_embed']
+            network.load_state_dict(state_dict, strict=False)
+
     if config['architecture'] == 'T2T-ViT_t-24':
         from .T2T.models import T2t_vit_t_24
         network = T2t_vit_t_24(num_classes=config['n_classes'], img_size=img_size)
