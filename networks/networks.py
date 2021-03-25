@@ -62,8 +62,11 @@ def get_network(config, img_size=None):
 
     if config['architecture'] == 'vit_large_patch16_384':
         from timm.models.vision_transformer import vit_large_patch16_384
-        network = vit_large_patch16_384(pretrained=config['pretrained'], num_classes=config['n_classes'], img_size=img_size)
-
+        network = vit_large_patch16_384(pretrained=config['pretrained'], num_classes=config['n_classes'], img_size=img_size, drop_rate=0.1)
+    if config['architecture'] == 'vit_base_patch16_384':
+        from timm.models.vision_transformer import vit_base_patch16_384
+        network = vit_base_patch16_384(pretrained=config['pretrained'], num_classes=config['n_classes'])
+    
     if config['architecture'] == 'T2T-ViT-14':
         from .T2T.models import T2t_vit_14
         network = T2t_vit_14(num_classes=config['n_classes'], img_size=img_size)
