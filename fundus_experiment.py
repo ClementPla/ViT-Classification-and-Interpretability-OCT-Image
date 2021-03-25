@@ -111,23 +111,27 @@ class FundusClassification(Experiment):
         log_artifact(self.tracker, os.path.realpath(__file__))
         super(FundusClassification, self).start()
 
-    def validate(self, model, iteration, rank=0):
+    def validate(self, model, valid_loader, iteration, rank=0, loss_function=None):
         model.eval()
-        valid_loader, valid_sampler = self.get_dataloader(self.validation_dataset, shuffle=False)
         confMat = torch.zeros(self.n_classes, self.n_classes).cuda(self.get_gpu_from_rank(rank))
-        for batch in valid_loader:
+        losses = 0
+        for n, batch in enumerate(valid_loader):
             img = batch[0].cuda(self.get_gpu_from_rank(rank))
             gt = batch[1].cuda(self.get_gpu_from_rank(rank))
             pred = torch.argmax(model(img), 1)
+            losses += loss_function(pred, gt).detach()
             confMat += NNmetrics.confusion_matrix(pred, gt, num_classes=self.n_classes)
         if self.multi_gpu:
             confMat = reduce_tensor(confMat, self.world_size, mode='sum')
+            losses = reduce_tensor(losses, self.world_size, mode='sum') / self.world_size
+        losses = losses/n
 
         confMat = NNmetrics.filter_index_cm(confMat, self.ignore_index)
         mIoU = NNmetrics.mIoU_cm(confMat)
         if self.is_main_process(rank):
             stats = NNmetrics.report_cm(confMat)
             stats['mIoU'] = mIoU
+            stats['validation_losses'] = losses.item()
             log_metrics(self.tracker, step=iteration, **stats)
             if self.tracked_metric is None:
                 self.tracked_metric = mIoU
