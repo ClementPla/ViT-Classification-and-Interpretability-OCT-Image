@@ -118,7 +118,8 @@ class FundusClassification(Experiment):
         for n, batch in enumerate(valid_loader):
             img = batch[0].cuda(self.get_gpu_from_rank(rank))
             gt = batch[1].cuda(self.get_gpu_from_rank(rank))
-            pred = torch.argmax(model(img), 1)
+            prob = model(img)
+            pred = torch.argmax(prob, 1)
             losses += loss_function(pred, gt).detach()
             confMat += NNmetrics.confusion_matrix(pred, gt, num_classes=self.n_classes)
         if self.multi_gpu:
