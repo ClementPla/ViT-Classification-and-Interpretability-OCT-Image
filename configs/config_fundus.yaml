@@ -2,11 +2,15 @@ Manager:
   experiment: FundusClassification
   run: Transformer
   save_point: /home/clement/Documents/Clement/runs/
-  gpu: 0
+  gpu: [1,2,3]
   max_saved_model: 1
-  num_workers: 12 # Workers used for parallel data loading
+  num_workers: 4 # Workers used for parallel data loading
   dist_backend: nccl
   seed: 1234
+  tracking_uri: http://localhost:5010
+  artifact_uri: /home/clement/Documents/Clement/runs/server/artifact/
+  amp: True
+  grad_scaling: True
 
 Dataset:
 #  shape: [1520,496] # wxh
@@ -41,8 +45,6 @@ Training:
   batch_size: 32
   iters_to_accumulate: 1
   weighted_loss: False
-  grad_scaling: True
-  amp: True
   params_weighting:
     mode: balanced
     log_smoothing: 1.5
@@ -50,8 +52,15 @@ Training:
 
 Loss:
   fusion: sum
-  SoftCrossEntropy:
-    smooth_factor: 0.1
+  type: SoftCrossEntropy
+  params_loss:
+    SoftCrossEntropy:
+      smooth_factor: 0.1
+  weighted_loss: True
+    params_weighting:
+      mode: balanced
+      log_smoothing: 1.5
+      center_mean: 0
 
 Optimizer:
   solver: Adam
@@ -77,5 +86,5 @@ Network:
   architecture: vit_base_patch32_384
   pretrained: True
   n_classes: 5
-  synchronized_batch_norm: False
+  synchronized_batch_norm: True
 

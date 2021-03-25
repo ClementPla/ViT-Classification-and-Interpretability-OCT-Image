@@ -50,7 +50,7 @@ Loss:
   weighted_loss: True
   params_weighting:
     mode: balanced
-    log_smoothing: 1.5
+    log_smoothing: 1.6
     center_mean: 0
 
 Optimizer:
