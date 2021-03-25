@@ -2,9 +2,9 @@ Manager:
   experiment: OCT-Classification
   run: ResNetWide101
   save_point: /home/travail/clement/runs/
-  gpu: [0,1,2]
+  gpu: [0,1,2, 3]
   max_saved_model: 1
-  num_workers: 6 # Workers used for parallel data loading
+  num_workers: 8 # Workers used for parallel data loading
   dist_backend: nccl
   seed: 1234
 
@@ -17,7 +17,7 @@ Manager:
 
 Dataset:
 #  shape: [1520,496] # wxh
-# shape: [224, 224]
+  #shape: [224, 224]
   shape: [384, 384]
   keep_size_ratio: False
   img_url: /home/travail/clement/Kermany/CellData/OCT/train/
@@ -32,18 +32,20 @@ Preprocessing:
   std: [0.5,0.5,0.5]
 Validation:
   size: 500
-  log_interval: 500
+  log_interval: 5000
   max_batch_validation: -1
 
 Training:
-  epochs: 25
+  epochs: 50
   batch_size: 32
   iters_to_accumulate: 1
+  #grad_clipping: 1.0
+
 
 
 Loss:
   fusion: sum
-  type: CrossEntropy
+  type: SoftCrossEntropy
   params_loss:
     SoftCrossEntropy:
       smooth_factor: 0.05
@@ -55,23 +57,23 @@ Loss:
     center_mean: 0
 
 Optimizer:
-  solver: AdamW
+  solver: SGD
   params_solver:
     lr: 0.001
 #    betas: [.9,.99]
-    weight_decay: 0.005
-#    nesterov: True
-#    momentum: 0.9
-#    dampening: 0
+    weight_decay: 0.003
+    nesterov: True
+    momentum: 0.9
+    dampening: 0
 
 Learning_rate_scheduler:
   update_type: on_validation # or on_epoch
   scheduler: ReduceLROnPlateau
   params_scheduler:
     mode: max
-    factor: 0.1
-    patience: 5
-    min_lr: 0.000001
+    factor: 0.5
+    patience: 10
+    min_lr: 0.0000001
     verbose: True
 
 Network:
