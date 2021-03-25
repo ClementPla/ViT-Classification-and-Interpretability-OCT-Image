@@ -23,9 +23,13 @@ class FundusClassification(Experiment):
         """
         Create network
         """
-        network = get_network(self.config['Network'])
+        img_size = self.config['Dataset']['shape'][0]
+        network = get_network(self.config['Network'], img_size)
 
-        remove_weight_decay = network.no_weight_decay()
+        if hasattr(network, 'no_weight_decay'):
+            remove_weight_decay = network.no_weight_decay()
+        else:
+            remove_weight_decay = {}
         network = self.set_model(network)
 
         params = []
