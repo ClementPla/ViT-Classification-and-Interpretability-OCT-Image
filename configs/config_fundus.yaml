@@ -57,10 +57,10 @@ Loss:
     SoftCrossEntropy:
       smooth_factor: 0.1
   weighted_loss: True
-    params_weighting:
-      mode: balanced
-      log_smoothing: 1.5
-      center_mean: 0
+  params_weighting:
+    mode: balanced
+    log_smoothing: 1.5
+    center_mean: 0
 
 Optimizer:
   solver: Adam
