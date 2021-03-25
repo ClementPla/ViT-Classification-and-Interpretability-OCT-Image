@@ -1,14 +1,14 @@
 Manager:
   experiment: OCT-Classification
   run: ResNetWide101
-  save_point: /home/clement/Documents/Clement/runs/
+  save_point: /usagers/clpla/Projects/runs
   gpu: 0
   max_saved_model: 1
   num_workers: 4 # Workers used for parallel data loading
   dist_backend: nccl
   seed: 1234
   tracking_uri: http://localhost:5010
-  artifact_uri: /home/clement/Documents/Clement/runs/server/artifact/
+  artifact_uri: sftp://clement@m3202-10.demdgi.polymtl.ca/home/clement/Documents/Clement/runs/server/artifact
   amp: True
   grad_scaling: True
 
